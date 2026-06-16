@@ -1,18 +1,17 @@
 package com.company.asteroid.dto.response;
 
+import com.company.asteroid.exception.ErrorCode;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@Getter
 @Builder
-public class ErrorResponse {
-    private LocalDateTime timestamp;
-
-    private int status;
-
-    private String error;
-
-    private String message;
+public record ErrorResponse(
+        LocalDateTime timestamp,
+        Integer status,
+        ErrorCode code,
+        String error,
+        String message
+) {
 }
