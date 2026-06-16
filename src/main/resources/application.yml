@@ -1,0 +1,14 @@
+server:
+  port: 8090
+spring:
+  application:
+    name: asteroid
+
+nasa:
+  api:
+    base-url: https://api.nasa.gov
+    api-key: ${NASA_API_KEY:DEMO_KEY}
+
+logging:
+  level:
+    root: INFO
