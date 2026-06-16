@@ -3,7 +3,9 @@ package com.company.asteroid.client;
 import com.company.asteroid.config.NasaProperties;
 import com.company.asteroid.dto.nasa.NasaFeedResponse;
 import com.company.asteroid.dto.nasa.NasaLookupResponse;
+import com.company.asteroid.exception.NasaApiException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -29,6 +31,16 @@ public class NasaClientImpl implements NasaClient{
                                 .build()
                 )
                 .retrieve()
+                .onStatus(
+                        HttpStatusCode::isError,
+                        response -> response.bodyToMono(String.class)
+                                .map(body ->
+                                        new NasaApiException(
+                                                "NASA API returned error: "
+                                                        + response.statusCode()
+                                        )
+                                )
+                )
                 .bodyToMono(NasaFeedResponse.class)
                 .block();
     }
