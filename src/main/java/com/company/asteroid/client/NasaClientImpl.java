@@ -34,10 +34,12 @@ public class NasaClientImpl implements NasaClient{
                 .onStatus(
                         HttpStatusCode::isError,
                         response -> response.bodyToMono(String.class)
-                                .map(body ->
-                                        new NasaApiException(
-                                                "NASA API returned error: "
-                                                        + response.statusCode()
+                                .flatMap(body ->
+                                        reactor.core.publisher.Mono.error(
+                                                new NasaApiException(
+                                                        "NASA API returned error: "
+                                                                + response.statusCode()
+                                                )
                                         )
                                 )
                 )
@@ -52,9 +54,28 @@ public class NasaClientImpl implements NasaClient{
                 .uri(uriBuilder ->
                         uriBuilder
                                 .path("/neo/rest/v1/neo/{id}")
+                                .queryParam(
+                                        "api_key",
+                                        nasaProperties.getApiKey()
+                                )
                                 .build(asteroidId)
                 )
                 .retrieve()
+                .onStatus(
+                        HttpStatusCode::isError,
+                        response ->
+                                response.bodyToMono(String.class)
+                                        .flatMap(body ->
+                                                reactor.core.publisher.Mono.error(
+                                                        new NasaApiException(
+                                                                "NASA Lookup API returned error: "
+                                                                        + response.statusCode()
+                                                                        + ", body: "
+                                                                        + body
+                                                        )
+                                                )
+                                        )
+                )
                 .bodyToMono(NasaLookupResponse.class)
                 .block();
     }
