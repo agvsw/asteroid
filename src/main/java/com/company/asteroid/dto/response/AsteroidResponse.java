@@ -5,6 +5,7 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 
+@Builder
 public record AsteroidResponse(
         String id,
         String name,
